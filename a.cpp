@@ -1,144 +1,77 @@
 #include <iostream>
+#include <cstring>
 using namespace std;
 
+template<typename T>
 class List {
-private:
     struct Node {
-        int data;
+        T data;
         Node* next;
-        Node(int d) : data(d), next(nullptr) {}
+        Node(const T& d) : data(d), next(nullptr) {}
     };
-
     Node* head;
-    int sz;
-
-    void copy(const List& other) {
-        head = nullptr;
-        sz = 0;
-        Node* cur = other.head;
-        Node* tail = nullptr;
-        while (cur) {
-            Node* n = new Node(cur->data);
-            if (!tail) head = n;
-            else tail->next = n;
-            tail = n;
-            sz++;
-            cur = cur->next;
-        }
-    }
-
-    void free() {
-        while (head) {
-            Node* tmp = head;
-            head = head->next;
-            delete tmp;
-        }
-        sz = 0;
-    }
-
 public:
-    List() : head(nullptr), sz(0) {}
-    List(const List& other) { copy(other); }
-    ~List() { free(); }
-
+    List() : head(nullptr) {}
+    ~List() { clear(); }
+    List(const List& other) : head(nullptr) {
+        Node* cur = other.head;
+        while(cur) { add(cur->data); cur = cur->next; }
+    }
     List& operator=(const List& other) {
-        if (this != &other) { free(); copy(other); }
+        if(this != &other) { clear(); Node* cur = other.head; while(cur) { add(cur->data); cur = cur->next; } }
         return *this;
     }
-
-    List operator+(int item) const {
-        List result(*this);
-        Node* n = new Node(item);
-        if (!result.head) {
-            result.head = n;
-        } else {
-            Node* cur = result.head;
-            while (cur->next) cur = cur->next;
-            cur->next = n;
-        }
-        result.sz++;
-        return result;
+    void clear() {
+        while(head) { Node* tmp = head; head = head->next; delete tmp; }
     }
-
-    List& operator--() {
-        if (!head) return *this;
-        if (!head->next) {
-            delete head;
-            head = nullptr;
-            sz = 0;
-            return *this;
-        }
+    void add(const T& val) {
+        Node* n = new Node(val);
+        if(!head) { head = n; return; }
         Node* cur = head;
-        while (cur->next->next) cur = cur->next;
+        while(cur->next) cur = cur->next;
+        cur->next = n;
+    }
+    List& operator+(const T& item) {
+        add(item);
+        return *this;
+    }
+    void operator--(int) {
+        if(!head) return;
+        if(!head->next) { delete head; head = nullptr; return; }
+        Node* cur = head;
+        while(cur->next->next) cur = cur->next;
         delete cur->next;
         cur->next = nullptr;
-        sz--;
-        return *this;
     }
-
-    List operator--(int) {
-        List before(*this);
-        --(*this);
-        return before;
-    }
-
-    bool operator==(const List& other) const {
-        if (sz != other.sz) return false;
-        Node* a = head;
-        Node* b = other.head;
-        while (a) {
-            if (a->data != b->data) return false;
-            a = a->next;
-            b = b->next;
-        }
-        return true;
-    }
-
     bool operator!=(const List& other) const {
-        return !(*this == other);
-    }
-
-    void print() const {
-        Node* cur = head;
-        cout << "[";
-        while (cur) {
-            cout << cur->data;
-            if (cur->next) cout << " -> ";
-            cur = cur->next;
+        Node* c1 = head;
+        Node* c2 = other.head;
+        while(c1 && c2) {
+            if(!(c1->data == c2->data)) return true;
+            c1 = c1->next;
+            c2 = c2->next;
         }
-        cout << "]  size=" << sz << "\n";
+        return c1 != nullptr || c2 != nullptr;
+    }
+    void forEach(void (*f)(const T&)) const {
+        Node* cur = head;
+        while(cur) { f(cur->data); cur = cur->next; }
     }
 };
 
+void printInt(int i) { cout << i << " "; }
+
 int main() {
-    List l1;
-    l1 = l1 + 10;
-    l1 = l1 + 20;
-    l1 = l1 + 30;
-    l1 = l1 + 40;
-    cout << "l1: "; l1.print();
+    List<int> l1;
+    l1 + 1; l1 + 2; l1 + 3;
+    l1--;
+    cout << "List1: ";
+    l1.forEach(printInt);
+    cout << "\n";
 
-    List l2;
-    l2 = l2 + 10;
-    l2 = l2 + 20;
-    l2 = l2 + 99;
-    cout << "l2: "; l2.print();
+    List<int> l2;
+    l2 + 1; l2 + 2;
 
-    cout << "l1 != l2: " << (l1 != l2 ? "true" : "false") << "\n";
-
-    List l3 = l1;
-    cout << "l3 (копия l1): "; l3.print();
-    cout << "l1 != l3: " << (l1 != l3 ? "true" : "false") << "\n";
-
-    cout << "\nПостфиксный l1--:\n";
-    List snap = l1--;
-    cout << "  снимок: "; snap.print();
-    cout << "  l1:     "; l1.print();
-
-    cout << "\nПрефиксный --l1 три раза:\n";
-    --l1; cout << "  "; l1.print();
-    --l1; cout << "  "; l1.print();
-    --l1; cout << "  "; l1.print();
-
+    cout << "l1 != l2: " << (l1 != l2) << "\n";
     return 0;
 }
