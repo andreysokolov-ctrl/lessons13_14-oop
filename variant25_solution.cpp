@@ -3,7 +3,7 @@
 #include <cstring>
 using namespace std;
 
-// ===== ЗАДАЧА a) Однонаправленный список =====
+// a) Однонаправленный список
 
 template <class T>
 class List {
@@ -87,7 +87,7 @@ public:
     int size() const { return sz; }
 };
 
-// ===== ЗАДАЧА b) Иерархия классов: Микроорганизмы =====
+// b) Иерархия классов: Микроорганизмы
 
 class Microorganism {
 protected:
@@ -153,12 +153,12 @@ public:
     }
 };
 
-// ===== ЗАДАЧА c) Шаблонный класс однонаправленного списка =====
+// c) Шаблонный класс однонаправленного списка
 // Класс List уже шаблонный (объявлен выше).
 // Демонстрируем его работу с Microorganism* и char.
 
 int main() {
-    // --- Демонстрация задачи a) и c) для char ---
+    // a) и c) для char
     cout << "=== List<char> ===" << endl;
     List<char> charList;
     charList + 'A';
@@ -185,7 +185,7 @@ int main() {
     charList3 + 'C';
     cout << "charList != charList3 (same): " << (charList != charList3 ? "true" : "false") << endl;
 
-    // --- Демонстрация задачи b) ---
+    //  b)
     cout << "\n=== Hierarchy: Microorganisms ===" << endl;
 
     Bacterium b1("E.coli", 2.0, "rod");
@@ -203,7 +203,7 @@ int main() {
     cout << "\nTotal organisms created: " << Microorganism::getCount() << endl;
     cout << "Minimum size: " << Microorganism::getMinSize() << " um" << endl;
 
-    // --- Демонстрация задачи c) для List<Microorganism*> ---
+    // c) для List<Microorganism*> 
     cout << "\n=== List<Microorganism*> ===" << endl;
     List<Microorganism*> bioList;
     bioList + static_cast<Microorganism*>(&b1);
